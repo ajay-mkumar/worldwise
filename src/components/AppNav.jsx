@@ -1,12 +1,16 @@
-import style from "./appnav.module.css"
+import { NavLink } from 'react-router-dom'
+import styles from './AppNav.module.css'
 function AppNav() {
     return (
-        <div className={style.appnav}>
-            <ul>
-                <li>some</li>
-                <li>some1</li>
-                <li>some2</li>
-            </ul>
+        <div className={styles.nav}>
+          <ul>
+            <li>
+                <NavLink to={"cities"}>City</NavLink>
+            </li>
+            <li>
+                <NavLink to={"countries"}>Country</NavLink>
+            </li>
+          </ul>
         </div>
     )
 }
