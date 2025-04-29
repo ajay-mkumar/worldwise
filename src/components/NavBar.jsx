@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import Logo from "./Logo";
-import styles from "./PageNav.module.css";
+import styles from "./NavBar.module.css";
 import { useAuth } from "../contexts/FakeAuthContext";
 
 function NavBar() {
