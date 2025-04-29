@@ -105,7 +105,6 @@ function CitiesProvider({ children }) {
   }
 
   
-  if (error) return <Message message={error} />
 
   return (
     <CitiesContext.Provider
