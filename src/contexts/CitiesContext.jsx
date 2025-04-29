@@ -31,7 +31,7 @@ function CitiesProvider({ children }) {
   async function getCity(id) {
     try {
       setIsLoading(true);
-      console.log(id)
+      console.log(id);
       const res = await fetch(`${BASE_URL}/cities/${id}`);
 
       if (!res.ok) throw new Error("Something went wrong");
@@ -44,6 +44,25 @@ function CitiesProvider({ children }) {
     }
   }
 
+  async function addCity(newCity) {
+    try {
+      setIsLoading(true);
+      const res = await fetch(`${BASE_URL}/cities/`, {
+        method: "POST",
+        body: JSON.stringify(newCity),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) throw new Error("Something went wrong");
+      const data = await res.json();
+      
+      setCities(city => [...city, data]);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <CitiesContext.Provider
@@ -51,7 +70,8 @@ function CitiesProvider({ children }) {
         cities,
         isLoading,
         currentCity,
-        getCity
+        getCity,
+        addCity
       }}
     >
       {children}
