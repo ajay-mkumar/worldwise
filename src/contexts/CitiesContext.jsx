@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 import Message from "../components/Message";
 
-const BASE_URL = "http://localhost:9000";
+const BASE_URL = "https://myworldtrip.netlify.app/";
 
 const initialState = {
   cities: [],
@@ -49,11 +49,11 @@ function CitiesProvider({ children }) {
     async function fetchCities() {
       try {
         dispatch({ type: "loading" });
-        const res = await fetch(`${BASE_URL}/cities`);
+        const res = await fetch(`${BASE_URL}/cities.json`);
 
         if (!res.ok) throw new Error("Something went wrong");
         const data = await res.json();
-        dispatch({ type: "cities/loaded", payload: data });
+        dispatch({ type: "cities/loaded", payload: data.cities });
       } catch (err) {
         dispatch({type: "rejected", payload: err.message});
       }
@@ -65,11 +65,11 @@ function CitiesProvider({ children }) {
   async function getCity(id) {
     try {
       dispatch({ type: "loading" });
-      const res = await fetch(`${BASE_URL}/cities/${id}`);
+      const res = await fetch(`${BASE_URL}/cities.json/${id}`);
 
       if (!res.ok) throw new Error("Something went wrong");
       const data = await res.json();
-      dispatch({ type: "citiy/loaded", payload: data });
+      dispatch({ type: "citiy/loaded", payload: data.cities  });
     } catch (err) {
       dispatch({type: "rejected", payload: err.message});
     } 
@@ -78,7 +78,7 @@ function CitiesProvider({ children }) {
   async function addCity(newCity) {
     try {
       dispatch({ type: "loading" });
-      const res = await fetch(`${BASE_URL}/cities/`, {
+      const res = await fetch(`${BASE_URL}/cities.json/`, {
         method: "POST",
         body: JSON.stringify(newCity),
         headers: { "Content-Type": "application/json" },
@@ -87,7 +87,7 @@ function CitiesProvider({ children }) {
       if (!res.ok) throw new Error("Something went wrong");
       const data = await res.json();
 
-      dispatch({ type: "cities/created", payload: data });
+      dispatch({ type: "cities/created", payload: data.cities  });
     } catch (err) {
       dispatch({type: "rejected", payload: err.message});
     } 
@@ -96,7 +96,7 @@ function CitiesProvider({ children }) {
   async function deleteCity(id) {
     try {
       dispatch({ type: "loading" });
-      await fetch(`${BASE_URL}/cities/${id}`, { method: "delete" });
+      await fetch(`${BASE_URL}/cities.json/${id}`, { method: "delete" });
 
       dispatch({ type: "cities/deleted", payload: id });
     } catch (err) {

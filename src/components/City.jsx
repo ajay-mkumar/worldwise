@@ -19,7 +19,6 @@ function City() {
 
   useEffect(
     function () {
-      console.log("enter")
       getCity(id);
     },
     [id]
