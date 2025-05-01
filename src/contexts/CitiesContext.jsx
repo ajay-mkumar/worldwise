@@ -1,13 +1,19 @@
-import { createContext, useContext, useEffect, useReducer } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react";
 import Message from "../components/Message";
 
-const BASE_URL = "https://myworldtrip.netlify.app/";
+const BASE_URL = "http://localhost:9000";
 
 const initialState = {
   cities: [],
   isLoading: false,
   currentCity: {},
-  error: ''
+  error: "",
 };
 
 function reducer(state, action) {
@@ -31,7 +37,7 @@ function reducer(state, action) {
     case "citiy/loaded":
       return { ...state, isLoading: false, currentCity: action.payload };
     case "rejected":
-      return {...state, isLoading: false, error: action.payload}
+      return { ...state, isLoading: false, error: action.payload };
     default:
       throw new Error("unauthorized action");
   }
@@ -49,36 +55,41 @@ function CitiesProvider({ children }) {
     async function fetchCities() {
       try {
         dispatch({ type: "loading" });
-        const res = await fetch(`${BASE_URL}/cities.json`);
+        const res = await fetch(`${BASE_URL}/cities`);
 
         if (!res.ok) throw new Error("Something went wrong");
         const data = await res.json();
-        dispatch({ type: "cities/loaded", payload: data.cities });
+        dispatch({ type: "cities/loaded", payload: data });
       } catch (err) {
-        dispatch({type: "rejected", payload: err.message});
+        dispatch({ type: "rejected", payload: err.message });
       }
     }
 
     fetchCities();
   }, []);
 
-  async function getCity(id) {
-    try {
-      dispatch({ type: "loading" });
-      const res = await fetch(`${BASE_URL}/cities.json/${id}`);
+  const getCity = useCallback(
+    async function getCity(id) {
+      if (Number(id) === currentCity.id) return;
 
-      if (!res.ok) throw new Error("Something went wrong");
-      const data = await res.json();
-      dispatch({ type: "citiy/loaded", payload: data.cities  });
-    } catch (err) {
-      dispatch({type: "rejected", payload: err.message});
-    } 
-  }
+      dispatch({ type: "loading" });
+      try {
+        const res = await fetch(`${BASE_URL}/cities/${id}`);
+
+        if (!res.ok) throw new Error("Something went wrong");
+        const data = await res.json();
+        dispatch({ type: "citiy/loaded", payload: data });
+      } catch (err) {
+        dispatch({ type: "rejected", payload: err.message });
+      }
+    },
+    [currentCity.id]
+  );
 
   async function addCity(newCity) {
     try {
       dispatch({ type: "loading" });
-      const res = await fetch(`${BASE_URL}/cities.json/`, {
+      const res = await fetch(`${BASE_URL}/cities`, {
         method: "POST",
         body: JSON.stringify(newCity),
         headers: { "Content-Type": "application/json" },
@@ -87,24 +98,22 @@ function CitiesProvider({ children }) {
       if (!res.ok) throw new Error("Something went wrong");
       const data = await res.json();
 
-      dispatch({ type: "cities/created", payload: data.cities  });
+      dispatch({ type: "cities/created", payload: data });
     } catch (err) {
-      dispatch({type: "rejected", payload: err.message});
-    } 
+      dispatch({ type: "rejected", payload: err.message });
+    }
   }
 
   async function deleteCity(id) {
     try {
       dispatch({ type: "loading" });
-      await fetch(`${BASE_URL}/cities.json/${id}`, { method: "delete" });
+      await fetch(`${BASE_URL}/cities/${id}`, { method: "delete" });
 
       dispatch({ type: "cities/deleted", payload: id });
     } catch (err) {
-      dispatch({type: "rejected", payload: err.message});
-    } 
+      dispatch({ type: "rejected", payload: err.message });
+    }
   }
-
-  
 
   return (
     <CitiesContext.Provider
